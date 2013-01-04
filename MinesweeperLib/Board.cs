@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Minesweeper
 {
@@ -10,18 +11,9 @@ namespace Minesweeper
 
         public Board(string init)
         {
-            init = init.Replace("\r", "");
-            int width = 0;
-            int height = 0;
-            string[] rows = new string[0];
-
-
-            if (!string.IsNullOrEmpty(init))
-            {
-                rows = init.Split(',', '\n').Where(row => !string.IsNullOrEmpty(row)).ToArray();
-                height = rows.Count();
-                width = rows.Max(x => x.Length);
-            }
+            var rows = init.Split(new [] {",", "\r\n"}, StringSplitOptions.RemoveEmptyEntries);
+            var height = rows.Count();
+            var width = height == 0 ? 0 : rows.Max(x => x.Length);
 
             cells = new Cell[width,height];
             for (int i = 0; i < height; ++i)
@@ -77,6 +69,20 @@ namespace Minesweeper
                 return NeighbourMineCount(x, y);
 
             return 0;
+        }
+
+        public string Save()
+        {
+            var builder = new StringBuilder();
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                    builder.Append(cells[x, y].IsBomb ? '*' : ' ');
+
+                builder.AppendLine();
+            }
+
+            return builder.ToString();
         }
     }
 }

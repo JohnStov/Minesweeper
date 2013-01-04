@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 
 using Minesweeper;
@@ -105,6 +106,34 @@ namespace MinsweeperTest
             Assert.That(board[1, 0].MineCount, Is.EqualTo(1));
             Assert.That(board[1, 2].MineCount, Is.EqualTo(2));
             Assert.That(board[5, 5].MineCount, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void CanSaveBoard()
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine("      ");
+            builder.AppendLine(" *    ");
+            builder.AppendLine("      ");
+            builder.AppendLine("  *   ");
+            builder.AppendLine("      ");
+            builder.Append(    "      ");
+            var board = new Board(builder.ToString());
+
+            var serialized = board.Save();
+
+            var lines = serialized.Split(new [] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
+
+            Assert.That(lines.Count(), Is.EqualTo(6));
+            Assert.That(lines.All(x => x.Length == 6));
+            Assert.That(string.IsNullOrWhiteSpace(lines[0]));
+            Assert.That(!string.IsNullOrWhiteSpace(lines[1]));
+            Assert.That(string.IsNullOrWhiteSpace(lines[2]));
+            Assert.That(!string.IsNullOrWhiteSpace(lines[3]));
+            Assert.That(string.IsNullOrWhiteSpace(lines[4]));
+            Assert.That(string.IsNullOrWhiteSpace(lines[5]));
+            Assert.That(lines[1][1], Is.EqualTo('*'));
+            Assert.That(lines[3][2], Is.EqualTo('*'));
         }
     }
 }
