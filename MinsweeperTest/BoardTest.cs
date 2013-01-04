@@ -79,5 +79,32 @@ namespace MinsweeperTest
             Assert.That(board[0, 0].IsBomb, Is.False);
             Assert.That(board[1, 0].IsBomb, Is.True);
         }
+
+        [Test]
+        public void CanCountNeighbouringMines()
+        {
+            var board = new Board(" *,  ");
+
+            Assert.That(board[0, 0].MineCount, Is.EqualTo(1));
+            Assert.That(board[1, 0].MineCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void CanCountNeighbouringMines2()
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine("      ");
+            builder.AppendLine(" *    ");
+            builder.AppendLine("      ");
+            builder.AppendLine("  *   ");
+            builder.AppendLine("      ");
+            builder.Append(    "      ");
+            var board = new Board(builder.ToString());
+
+            Assert.That(board[0, 0].MineCount, Is.EqualTo(1));
+            Assert.That(board[1, 0].MineCount, Is.EqualTo(1));
+            Assert.That(board[1, 2].MineCount, Is.EqualTo(2));
+            Assert.That(board[5, 5].MineCount, Is.EqualTo(0));
+        }
     }
 }

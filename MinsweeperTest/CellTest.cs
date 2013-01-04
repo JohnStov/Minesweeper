@@ -26,7 +26,7 @@ namespace MinsweeperTest
         [Test]
         public void CanCreateAsBomb()
         {
-            var cell = new Cell(true);
+            var cell = new Cell(null, true);
 
             Assert.That(cell.IsBomb, Is.True);
         }
