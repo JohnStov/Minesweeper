@@ -1,9 +1,11 @@
-﻿using MinesweeperLib;
+﻿using System;
+using MinesweeperLib;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using System.Linq;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -41,20 +43,30 @@ namespace Minesweeper
                     var button = new Button {Background = new SolidColorBrush(Colors.Purple), Content = " "};
                     button.SetValue(Grid.ColumnProperty, x);
                     button.SetValue(Grid.RowProperty, y);
-                    button.Click += button_Click;
+                    button.Click += ButtonClick;
                     cellGrid.Children.Add(button);
                 }
 
         }
 
-        void button_Click(object sender, RoutedEventArgs e)
+        private void ButtonClick(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             var x = (int)button.GetValue(Grid.ColumnProperty);
             var y = (int)button.GetValue(Grid.RowProperty);
 
-            if (board[x, y].IsVisible)
+            ShowCell(x, y);
+        }
+
+        private void ShowCell(int x, int y)
+        {
+            if (x < 0 || x >= board.Width || y < 0 || y >= board.Height || board[x, y].IsVisible)
                 return;
+
+            board[x, y].SetVisible();
+
+            var button =
+                cellGrid.Children.FirstOrDefault(b => (int)(b.GetValue(Grid.ColumnProperty)) == x && (int)(b.GetValue(Grid.RowProperty)) == y) as Button;
 
             if (board[x, y].IsBomb)
             {
@@ -63,10 +75,17 @@ namespace Minesweeper
             }
             else
             {
+                int count = board[x, y].MineCount;
                 button.Background = new SolidColorBrush(Colors.Green);
-                button.Content = board[x, y].MineCount.ToString();
+                if (count > 0)
+                    button.Content = board[x, y].MineCount.ToString();
+                else
+                {
+                    for (int i = x-1; i <= x+1; ++i)
+                        for (int j = y-1; j <= y+1; ++j)
+                            ShowCell(i, j);
+                }
             }
-            board[x,y].SetVisible();
         }
     }
 }
