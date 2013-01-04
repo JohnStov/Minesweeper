@@ -1,8 +1,7 @@
-﻿using Minesweeper;
-
+﻿using MinesweeperLib;
 using NUnit.Framework;
 
-namespace MinsweeperTest
+namespace MinesweeperTest
 {
     [TestFixture]
     public class CellTest
@@ -29,6 +28,23 @@ namespace MinsweeperTest
             var cell = new Cell(null, true);
 
             Assert.That(cell.IsBomb, Is.True);
+        }
+
+        [Test]
+        public void DefaultsToInvisible()
+        {
+            var cell = new Cell();
+
+            Assert.That(cell.IsVisible, Is.False);
+        }
+
+        [Test]
+        public void CanSetVisible()
+        {
+            var cell = new Cell();
+            cell.SetVisible();
+
+            Assert.That(cell.IsVisible, Is.True);
         }
     }
 }

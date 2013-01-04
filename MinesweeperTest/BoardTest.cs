@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-
-using Minesweeper;
-
+using MinesweeperLib;
 using NUnit.Framework;
 
-namespace MinsweeperTest
+namespace MinesweeperTest
 {
     [TestFixture]
     public class BoardTest
@@ -134,6 +132,24 @@ namespace MinsweeperTest
             Assert.That(string.IsNullOrWhiteSpace(lines[5]));
             Assert.That(lines[1][1], Is.EqualTo('*'));
             Assert.That(lines[3][2], Is.EqualTo('*'));
+        }
+
+        [Test]
+        public void CanCreateRandomBoard()
+        {
+            var board = new Board(10, 10, 5);
+            var serialized = board.Save();
+
+            var lines = serialized.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            Assert.That(lines.Count(), Is.EqualTo(10));
+            Assert.That(lines.All(x => x.Length == 10));
+
+            int starCount = 0;
+            for (int i = 0; i < serialized.Length; ++i)
+                if (serialized[i] == '*')
+                    ++starCount;
+
+            Assert.That(starCount, Is.EqualTo(5));
         }
     }
 }

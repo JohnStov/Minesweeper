@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Minesweeper
+namespace MinesweeperLib
 {
     public class Cell
     {
@@ -10,6 +10,7 @@ namespace Minesweeper
         {
             boardRef = new WeakReference(board);
             IsBomb = isBomb;
+            IsVisible = false;
         }
 
         public bool IsBomb { get; private set; } 
@@ -17,5 +18,12 @@ namespace Minesweeper
         private Board Board { get {return (Board)boardRef.Target;} }
 
         public int MineCount { get { return Board.MineCount(this); } }
+
+        public void SetVisible()
+        {
+            IsVisible = true;
+        }
+        
+        public bool IsVisible { get; private set; }
     }
 }

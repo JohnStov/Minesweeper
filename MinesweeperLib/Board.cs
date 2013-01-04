@@ -1,13 +1,29 @@
 ﻿using System;
-using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Minesweeper
+namespace MinesweeperLib
 {
-    using System.Linq;
-
     public class Board
     {
         private readonly Cell[,] cells;
+
+        internal class Point : IEquatable<Point>
+        {
+            public Point(int x, int y)
+            {
+                X = x;
+                Y = y;
+            }
+
+            public int X { get; private set; }
+            public int Y { get; private set; }
+
+            public bool Equals(Point other)
+            {
+                return X == other.X && Y == other.Y;
+            }
+        }
 
         public Board(string init)
         {
@@ -19,6 +35,28 @@ namespace Minesweeper
             for (int i = 0; i < height; ++i)
                 for (int j = 0; j < width; ++j)
                     cells[j,i] = new Cell(this, rows[i].Length > j && rows[i][j] == '*');
+        }
+
+        public Board(int width, int height, int bombCount)
+        {
+            var bombList = new List<Point>();
+            var rnd = new Random();
+
+            while (bombList.Count < bombCount)
+            {
+                var pt = new Point(rnd.Next(width), rnd.Next(height));
+                if (bombList.All(x => !x.Equals(pt)))
+                    bombList.Add(pt);
+            }
+
+            cells = new Cell[width, height];
+            for (int i = 0; i < height; ++i)
+                for (int j = 0; j < width; ++j)
+                {
+                    var pt = new Point(j, i);
+                    var isBomb = bombList.Any(x => x.Equals(pt));
+                    cells[j, i] = new Cell(this, isBomb);
+                }
         }
 
         public int Width { get { return cells.GetLength(0); } }
@@ -35,6 +73,15 @@ namespace Minesweeper
 
                 return cells[x, y];
             }
+        }
+
+        public bool Dig(int x, int y)
+        {
+            var gameOver = this[x, y].IsBomb;
+            if (!gameOver)
+                this[x, y].SetVisible();
+
+            return !gameOver;
         }
 
         private bool FindCellPosition(Cell cell, out int x, out int y)
@@ -62,27 +109,12 @@ namespace Minesweeper
 
         internal int MineCount(Cell cell)
         {
-            int x;
-            int y;
-
+            int x, y;
             if (FindCellPosition(cell, out x, out y))
                 return NeighbourMineCount(x, y);
 
             return 0;
         }
 
-        public string Save()
-        {
-            var builder = new StringBuilder();
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                    builder.Append(cells[x, y].IsBomb ? '*' : ' ');
-
-                builder.AppendLine();
-            }
-
-            return builder.ToString();
-        }
     }
 }
